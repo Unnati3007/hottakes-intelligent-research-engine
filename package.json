@@ -1,0 +1,20 @@
+{
+  "name": "hottakes-intelligent-research-engine",
+  "version": "1.0.0",
+  "description": "Hot Takes - Intelligent Research Engine & Trustworthy Consumer Verification System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "consumer-intelligence",
+    "gamification",
+    "behavioral-telemetry",
+    "response-quality-score",
+    "market-research",
+    "identity-verification"
+  ],
+  "author": "Product & AI Engineering Candidate",
+  "license": "MIT"
+}

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hot Takes — Intelligent Research & Consumer Verification Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Ambient Glow Background -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl glow-effect"></div>
+    <div class="absolute top-1/2 -right-40 w-96 h-96 bg-fuchsia-600/15 rounded-full blur-3xl glow-effect" style="animation-delay: 1.5s;"></div>
+    <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl glow-effect" style="animation-delay: 3s;"></div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="relative z-10 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-fuchsia-500 to-rose-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <i data-lucide="flame" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">HOT TAKES</span>
+            <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AI Research Engine</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Gamified Consumer Intelligence & Verification Platform</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex space-x-1 p-1 bg-slate-900/90 rounded-xl border border-slate-800">
+        <button onclick="switchTab('tab-challenge1')" id="nav-challenge1" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium transition-all flex items-center space-x-2 bg-indigo-600 text-white shadow-sm">
+          <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+          <span>Challenge 1 Prototype</span>
+        </button>
+        <button onclick="switchTab('tab-telemetry')" id="nav-telemetry" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium transition-all flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          <span>Live Telemetry & RQS</span>
+        </button>
+        <button onclick="switchTab('tab-ai-studio')" id="nav-ai-studio" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium transition-all flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>AI Question Studio</span>
+        </button>
+        <button onclick="switchTab('tab-challenge2')" id="nav-challenge2" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium transition-all flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Challenge 2 Verification</span>
+        </button>
+      </nav>
+
+      <!-- Engine Live Badge -->
+      <div class="flex items-center space-x-2 text-xs text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-full border border-slate-800">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-mono text-emerald-400 font-semibold" id="telemetry-ticker">Telemetry Active</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav -->
+  <div class="md:hidden flex overflow-x-auto p-2 bg-slate-900 border-b border-slate-800 space-x-2 z-10 relative">
+    <button onclick="switchTab('tab-challenge1')" class="px-3 py-1.5 rounded text-xs whitespace-nowrap bg-indigo-600 text-white">Ch 1 Prototype</button>
+    <button onclick="switchTab('tab-telemetry')" class="px-3 py-1.5 rounded text-xs whitespace-nowrap bg-slate-800 text-slate-300">Live Telemetry</button>
+    <button onclick="switchTab('tab-ai-studio')" class="px-3 py-1.5 rounded text-xs whitespace-nowrap bg-slate-800 text-slate-300">AI Studio</button>
+    <button onclick="switchTab('tab-challenge2')" class="px-3 py-1.5 rounded text-xs whitespace-nowrap bg-slate-800 text-slate-300">Ch 2 Verification</button>
+  </div>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: CHALLENGE 1 PROTOTYPE (THE GAMIFIED RESEARCH ENGINE)               -->
+    <!-- ========================================================================= -->
+    <div id="tab-challenge1" class="tab-content space-y-8">
+      
+      <!-- Banner / Problem Framing -->
+      <div class="glass-panel rounded-2xl p-6 border-l-4 border-indigo-500 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs uppercase tracking-wider font-bold text-indigo-400">Challenge 1: Working Prototype</span>
+              <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-semibold border border-amber-500/30">Industry: E-commerce / FMCG Delivery</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white mt-1">Transforming Stated Bias into Revealed Behavior</h1>
+            <p class="text-sm text-slate-300 mt-1 max-w-3xl">
+              Demonstrating how Hot Takes replaces hypothetical, socially desirable survey questions with gamified micro-budget allocations and forced trade-offs to capture authentic consumer willingness to pay.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetExperiment()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Reset Demo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Grid: Before vs After -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: The Conventional Flawed Survey (Part 1) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden border-rose-500/20">
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center space-x-1">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                <span>Conventional Survey Method (Flawed)</span>
+              </span>
+              <span class="text-xs text-slate-400">Hypothetical Self-Report</span>
+            </div>
+
+            <div class="space-y-4">
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <p class="text-xs text-slate-400 font-mono mb-1">ORIGINAL SURVEY QUESTION:</p>
+                <p class="text-sm font-semibold text-slate-100">
+                  "How important is eco-friendly, carbon-neutral packaging when you order food or retail items online?"
+                </p>
+              </div>
+
+              <!-- Conventional 1-5 Rating Scale -->
+              <div>
+                <label class="block text-xs text-slate-300 font-medium mb-2">Select your response as a consumer:</label>
+                <div class="grid grid-cols-5 gap-2" id="conventional-options">
+                  <button onclick="selectConventional(1)" class="conv-btn p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-center transition flex flex-col items-center">
+                    <span class="text-lg">😴</span>
+                    <span class="text-xs font-bold mt-1">1</span>
+                    <span class="text-[10px] text-slate-400">Not at all</span>
+                  </button>
+                  <button onclick="selectConventional(2)" class="conv-btn p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-center transition flex flex-col items-center">
+                    <span class="text-lg">😐</span>
+                    <span class="text-xs font-bold mt-1">2</span>
+                    <span class="text-[10px] text-slate-400">Slightly</span>
+                  </button>
+                  <button onclick="selectConventional(3)" class="conv-btn p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-center transition flex flex-col items-center">
+                    <span class="text-lg">🤔</span>
+                    <span class="text-xs font-bold mt-1">3</span>
+                    <span class="text-[10px] text-slate-400">Moderate</span>
+                  </button>
+                  <button onclick="selectConventional(4)" class="conv-btn p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-center transition flex flex-col items-center">
+                    <span class="text-lg">🌿</span>
+                    <span class="text-xs font-bold mt-1">4</span>
+                    <span class="text-[10px] text-slate-400">Very</span>
+                  </button>
+                  <button onclick="selectConventional(5)" class="conv-btn p-3 rounded-xl bg-indigo-600/30 border-2 border-indigo-500 text-center transition flex flex-col items-center shadow-lg shadow-indigo-500/20">
+                    <span class="text-lg">🌍</span>
+                    <span class="text-xs font-bold mt-1 text-indigo-300">5</span>
+                    <span class="text-[10px] text-indigo-300 font-semibold">Extremely</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Flaw Diagnosis Callout -->
+              <div class="p-3.5 rounded-xl bg-rose-950/30 border border-rose-900/50 text-xs text-rose-200/90 space-y-1.5">
+                <div class="flex items-center space-x-1.5 font-bold text-rose-400">
+                  <i data-lucide="x-circle" class="w-4 h-4"></i>
+                  <span>The Structural Flaws:</span>
+                </div>
+                <p>• <strong>Social Desirability Bias:</strong> 84% of respondents choose 4 or 5 because answering "I don't care about the planet" creates cognitive dissonance.</p>
+                <p>• <strong>Zero Friction Cost:</strong> Stating high virtue costs nothing when there is no financial or convenience penalty attached.</p>
+                <p>• <strong>The False Commercial Signal:</strong> Brands invest millions in green packaging expecting a surge in sales, only to find real checkout conversion fails to move.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Virtue Gap & Behavior Reveal (Updates dynamically) -->
+          <div class="glass-card rounded-2xl p-6 border-indigo-500/30" id="virtue-gap-card">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold tracking-wide uppercase text-indigo-400 flex items-center space-x-1">
+                <i data-lucide="scale" class="w-4 h-4"></i>
+                <span>The "Virtue Gap" Analysis</span>
+              </span>
+              <span id="virtue-status-pill" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Awaiting Game Play
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-400">Stated Importance (Survey Claim):</span>
+                  <span class="font-bold text-indigo-300" id="stated-importance-display">100% (Rating 5/5)</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-indigo-500 transition-all duration-500" id="stated-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-400">Revealed Willingness-to-Pay (Actual Game Sacrifice):</span>
+                  <span class="font-bold text-emerald-400" id="revealed-wtp-display">0%</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-emerald-500 transition-all duration-500" id="revealed-bar" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                <div>
+                  <span class="text-xs text-slate-400">Calculated Virtue Gap:</span>
+                  <p class="text-xl font-black text-rose-400" id="virtue-gap-display">100%</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs text-slate-400">Response Authenticity:</span>
+                  <p class="text-sm font-bold text-amber-400" id="authenticity-verdict">Aspirational Discrepancy</p>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-slate-400 italic bg-slate-900/60 p-2.5 rounded-lg border border-slate-800" id="insight-summary">
+                Play the gamified trade-off simulator on the right to see your true revealed preference vs stated claim!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: The Hot Takes Redesigned Gamified Experience (Part 2) -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="glass-card rounded-2xl p-6 border-indigo-500/40 relative">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-2">
+                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                  <span>Hot Takes Redesigned Experience</span>
+                </span>
+                <span class="text-xs text-slate-400">Forced Micro-Budget Trade-Off</span>
+              </div>
+
+              <!-- Available Wallet Credits -->
+              <div class="flex items-center space-x-2 bg-indigo-950/60 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+                <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
+                <span class="text-xs text-slate-300">Wallet:</span>
+                <span class="font-mono font-bold text-amber-300 text-sm" id="user-credits">100</span>
+                <span class="text-xs text-slate-400">Credits</span>
+              </div>
+            </div>
+
+            <!-- Game Instructions -->
+            <div class="bg-indigo-950/30 p-4 rounded-xl border border-indigo-500/20 mb-6">
+              <h3 class="text-sm font-bold text-indigo-200 flex items-center space-x-2">
+                <span>The Cart Dilemma: Assemble Your Delivery</span>
+              </h3>
+              <p class="text-xs text-slate-300 mt-1">
+                You have a fixed budget of <strong>100 Credits</strong>. Allocate your tokens across three competing delivery attributes. Notice how selecting eco-options forces genuine economic trade-offs!
+              </p>
+            </div>
+
+            <!-- Gamified Interactive Levers -->
+            <div class="space-y-6">
+              
+              <!-- Lever 1: Packaging Choice (Eco vs Standard) -->
+              <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">1</span>
+                    <span class="text-sm font-semibold text-white">Packaging Material</span>
+                  </div>
+                  <span class="text-xs text-slate-400" id="packaging-cost-tag">+0 Credits</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <button onclick="selectPackaging('standard')" id="btn-pack-std" class="pack-opt p-3 rounded-xl border-2 border-indigo-500 bg-indigo-950/40 text-left transition flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-white">Standard Packaging</span>
+                        <span class="text-[11px] font-mono text-emerald-400 font-bold">FREE</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 mt-1">Recyclable cardboard box with standard poly tape.</p>
+                    </div>
+                    <span class="text-[10px] text-slate-500 mt-2 font-mono">0 Credits</span>
+                  </button>
+
+                  <button onclick="selectPackaging('eco')" id="btn-pack-eco" class="pack-opt p-3 rounded-xl border border-slate-800 bg-slate-900/60 hover:border-slate-700 text-left transition flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-200">100% Bamboo / Compostable</span>
+                        <span class="text-[11px] font-mono text-amber-400 font-bold">-25 C</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 mt-1">Zero plastic, 100% biodegradable cassava wrap.</p>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 mt-2 font-mono">Real Eco Sacrifice</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lever 2: Delivery Speed vs Carbon Offset -->
+              <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">2</span>
+                    <span class="text-sm font-semibold text-white">Delivery Fleet & Timing</span>
+                  </div>
+                  <span class="text-xs text-slate-400" id="speed-cost-tag">+0 Credits</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <button onclick="selectSpeed('express')" id="btn-speed-exp" class="speed-opt p-3 rounded-xl border-2 border-indigo-500 bg-indigo-950/40 text-left transition flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-white">Express Delivery (15 mins)</span>
+                        <span class="text-[11px] font-mono text-emerald-400 font-bold">FREE</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 mt-1">Instant delivery via single motorcycle rider.</p>
+                    </div>
+                    <span class="text-[10px] text-rose-400 mt-2 font-mono">Higher Carbon Footprint</span>
+                  </button>
+
+                  <button onclick="selectSpeed('green')" id="btn-speed-grn" class="speed-opt p-3 rounded-xl border border-slate-800 bg-slate-900/60 hover:border-slate-700 text-left transition flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-200">Green Pooled (45 mins)</span>
+                        <span class="text-[11px] font-mono text-amber-400 font-bold">-15 C</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 mt-1">Electric vehicle batch delivery with pooled stops.</p>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 mt-2 font-mono">-65% Emissions</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lever 3: Instant Cashback vs Tree Planting Offset -->
+              <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-7 h-7 rounded-lg bg-fuchsia-500/20 text-fuchsia-400 flex items-center justify-center font-bold text-xs">3</span>
+                    <span class="text-sm font-semibold text-white">Reward / Offset Allocation</span>
+                  </div>
+                  <span class="text-xs font-slate-400" id="reward-cost-tag">+0 Credits</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <button onclick="selectReward('cashback')" id="btn-rew-cash" class="rew-opt p-3 rounded-xl border-2 border-indigo-500 bg-indigo-950/40 text-left transition flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-white">Direct Cashback</span>
+                        <span class="text-[11px] font-mono text-emerald-400 font-bold">+20 C</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 mt-1">Keep 20 credits returned straight to your wallet.</p>
+                    </div>
+                    <span class="text-[10px] text-indigo-300 mt-2 font-mono">Self-Interest Preference</span>
+                  </button>
+
+                  <button onclick="selectReward('offset')" id="btn-rew-tree" class="rew-opt p-3 rounded-xl border border-slate-800 bg-slate-900/60 hover:border-slate-700 text-left transition flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-200">Verified Tree Planting</span>
+                        <span class="text-[11px] font-mono text-amber-400 font-bold">-20 C</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400 mt-1">Donate 20 credits to plant a certified mangrove tree.</p>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 mt-2 font-mono">Altruistic Action</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Finalize & Submit Button -->
+              <div class="flex items-center justify-between pt-2">
+                <div class="text-xs text-slate-400">
+                  <span id="interaction-flips-count" class="font-mono text-indigo-400 font-bold">0</span> trade-off adjustments recorded
+                </div>
+                <button onclick="finalizeGameChoice()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-indigo-600 hover:from-indigo-500 hover:to-fuchsia-500 text-white font-bold text-xs tracking-wide uppercase transition shadow-lg shadow-indigo-600/30 flex items-center space-x-2">
+                  <span>Commit My Order</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: LIVE BEHAVIOURAL TELEMETRY & RQS INSPECTOR (CHALLENGE 1 PART B)     -->
+    <!-- ========================================================================= -->
+    <div id="tab-telemetry" class="tab-content space-y-8 hidden">
+      
+      <div class="glass-panel rounded-2xl p-6 border-l-4 border-cyan-500 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs uppercase tracking-wider font-bold text-cyan-400">Challenge 1: Part B Telemetry & Response Intelligence</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold border border-emerald-500/30">Real-Time Backend Pipeline</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white mt-1">Response Quality Score (RQS) & Telemetry Inspector</h1>
+            <p class="text-sm text-slate-300 mt-1 max-w-3xl">
+              Capturing micro-behavioural signals in the background: time-to-first-interaction, cognitive hesitation, mouse trajectory jitter, answer flipping, and straight-line entropy to detect fraud and bot patterns.
+            </p>
+          </div>
+
+          <!-- Simulation Triggers for Evaluator -->
+          <div class="flex items-center gap-2">
+            <button onclick="simulateNormalUser()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-emerald-600/30 transition">
+              Simulate Genuine Human
+            </button>
+            <button onclick="simulateSpeedingBot()" class="px-3 py-1.5 rounded-lg bg-rose-600/20 border border-rose-500/30 text-rose-300 text-xs font-semibold hover:bg-rose-600/30 transition">
+              Simulate Speeding / Bot
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="glass-card rounded-2xl p-5 border-indigo-500/20">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Response Quality Score (RQS)</span>
+            <i data-lucide="award" class="w-4 h-4 text-indigo-400"></i>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-3xl font-black text-white" id="card-rqs-score">88</span>
+            <span class="text-xs font-bold text-emerald-400" id="card-rqs-tier">GOLD TIER</span>
+          </div>
+          <div class="mt-2 w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400" id="card-rqs-bar" style="width: 88%;"></div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border-cyan-500/20">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Engagement Score (ES)</span>
+            <i data-lucide="flame" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-3xl font-black text-white" id="card-es-score">92</span>
+            <span class="text-xs font-bold text-cyan-400" id="card-es-tier">HIGH IMMERSION</span>
+          </div>
+          <div class="mt-2 w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-400" id="card-es-bar" style="width: 92%;"></div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border-fuchsia-500/20">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Cognitive Deliberation</span>
+            <i data-lucide="brain" class="w-4 h-4 text-fuchsia-400"></i>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-3xl font-black text-white" id="card-dwell-sec">4.8s</span>
+            <span class="text-xs text-slate-400 font-mono" id="card-flips-badge">2 Reversals</span>
+          </div>
+          <p class="text-[11px] text-emerald-400 mt-2" id="card-cognitive-desc">Active trade-off friction observed</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border-amber-500/20">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-400">Choice Shannon Entropy</span>
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-3xl font-black text-white" id="card-entropy-score">0.89</span>
+            <span class="text-xs font-bold text-emerald-400" id="card-entropy-status">NON-PATTERNED</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Zero straight-lining detected</p>
+        </div>
+
+      </div>
+
+      <!-- Live Stream Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Live Anomaly Badges & Mathematical Formulas -->
+        <div class="lg:col-span-6 space-y-6">
+          
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-indigo-400"></i>
+              <span>Active Anomaly & Authenticity Flags</span>
+            </h3>
+            
+            <div class="space-y-2" id="anomaly-badges-container">
+              <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span class="text-xs font-semibold text-emerald-200">Natural Reading Cadence</span>
+                </div>
+                <span class="text-[11px] font-mono text-emerald-400">4,820ms dwell</span>
+              </div>
+
+              <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span class="text-xs font-semibold text-emerald-200">Pointer Micro-Jitter Present</span>
+                </div>
+                <span class="text-[11px] font-mono text-emerald-400">σ² = 16.2 (Human)</span>
+              </div>
+
+              <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 flex items-center justify-between" id="flag-virtue-gap">
+                <div class="flex items-center space-x-2.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span class="text-xs font-semibold text-amber-200">Social Desirability Divergence</span>
+                </div>
+                <span class="text-[11px] font-mono text-amber-400">Virtue Gap: 80%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mathematical Formulation Callout -->
+          <div class="glass-card rounded-2xl p-6 space-y-3 bg-slate-900/60 font-mono text-xs">
+            <h3 class="font-sans text-sm font-bold text-slate-200 flex items-center space-x-2">
+              <i data-lucide="binary" class="w-4 h-4 text-cyan-400"></i>
+              <span>RQS Scoring Formulation</span>
+            </h3>
+            <p class="text-slate-400 text-[11px] font-sans">
+              Hot Takes computes RQS using a bounded multi-variate penalty function:
+            </p>
+            <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 text-indigo-300 overflow-x-auto">
+              RQS = clamp(100 × (0.35·S_pace + 0.30·S_delib + 0.25·H_norm + 0.10·Jitter) - Σ(P_anomalies), 0, 100)
+            </div>
+            <ul class="text-[11px] text-slate-400 space-y-1 font-sans">
+              <li>• <span class="text-indigo-300 font-mono">S_pace</span>: Compares dwell time against reading word count threshold.</li>
+              <li>• <span class="text-indigo-300 font-mono">S_delib</span>: Evaluates trade-off toggle reversals (1-3 flips = high thoughtfulness).</li>
+              <li>• <span class="text-indigo-300 font-mono">H_norm</span>: Shannon Entropy across choice batteries (-Σ p·log₂ p).</li>
+              <li>• <span class="text-indigo-300 font-mono">P_anomalies</span>: 15-point penalty per triggered violation flag.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Real-Time Raw Telemetry JSON Payload Stream -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="glass-card rounded-2xl p-6 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+                <span>Live Ingested Telemetry Event Payload</span>
+              </h3>
+              <span class="text-[10px] font-mono text-slate-400">POST /api/telemetry</span>
+            </div>
+
+            <div class="relative">
+              <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-[11px] font-mono text-cyan-300 overflow-x-auto max-h-96" id="telemetry-json-viewer">
+{
+  "sessionId": "sess_89f0291ba4",
+  "questionId": "q_eco_packaging_tradeoff",
+  "telemetry": {
+    "timeToFirstInteractionMs": 1420,
+    "totalDwellTimeMs": 4820,
+    "wordCount": 28,
+    "answerFlips": 2,
+    "cursorJitterVariance": 16.2,
+    "choiceHistory": ["standard", "eco", "standard"],
+    "entropy": 0.89
+  },
+  "gameTelemetry": {
+    "sliderAdjustments": 3,
+    "activeManipulatingTimeMs": 3400,
+    "walletSacrificePct": 25
+  },
+  "computedRQS": {
+    "responseQualityScore": 88,
+    "qualityTier": "GOLD",
+    "anomalyFlags": []
+  }
+}
+              </pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: AI QUESTION INTELLIGENCE STUDIO                                    -->
+    <!-- ========================================================================= -->
+    <div id="tab-ai-studio" class="tab-content space-y-8 hidden">
+      
+      <div class="glass-panel rounded-2xl p-6 border-l-4 border-fuchsia-500 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs uppercase tracking-wider font-bold text-fuchsia-400">AI Question Generation & Validation Studio</span>
+              <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-semibold border border-indigo-500/30">Psychometric Transformer</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white mt-1">Transforming Traditional Surveys into Gamified Mechanics</h1>
+            <p class="text-sm text-slate-300 mt-1 max-w-3xl">
+              Select or type any conventional market research question. Our AI model evaluates bias vectors (social desirability, leading language, acquiescence) and generates 3 validated gamified mechanics.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Studio Interactive Workbench -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Input & Bias Evaluation -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="edit-3" class="w-4 h-4 text-fuchsia-400"></i>
+              <span>Select or Enter Conventional Question</span>
+            </h3>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Preset Categories:</label>
+              <select id="preset-question-select" onchange="loadPresetQuestion()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                <option value="eco">1. Sustainability: Eco-Friendly Packaging (FMCG)</option>
+                <option value="fitness">2. Health & Fitness: Weekly Workout Frequency</option>
+                <option value="privacy">3. Tech / Privacy: Willingness to Pay for Ad-Free Platform</option>
+                <option value="luxury">4. Retail: Authentic Luxury vs Designer Replica</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Current Question Text:</label>
+              <textarea id="ai-question-input" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-fuchsia-500 font-sans">How important is eco-friendly packaging when you order items online?</textarea>
+            </div>
+
+            <button onclick="runAIAudit()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white font-bold text-xs tracking-wide transition flex items-center justify-center space-x-2 shadow-lg shadow-fuchsia-600/25">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Run AI Bias Audit & Generate Games</span>
+            </button>
+          </div>
+
+          <!-- AI Bias Audit Breakdown -->
+          <div class="glass-card rounded-2xl p-6 space-y-4" id="ai-audit-card">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="check-check" class="w-4 h-4 text-cyan-400"></i>
+              <span>AI Bias Risk Assessment</span>
+            </h3>
+
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-400">Social Desirability Risk:</span>
+                  <span class="font-bold text-rose-400" id="audit-sdr">HIGH (85/100)</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-rose-500" style="width: 85%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-400">Acquiescence Bias (Agreeableness):</span>
+                  <span class="font-bold text-amber-400" id="audit-acq">MODERATE (62/100)</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-amber-500" style="width: 62%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-400">Behavioral Predictability:</span>
+                  <span class="font-bold text-rose-400" id="audit-pred">POOR (28/100)</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-rose-500" style="width: 28%;"></div>
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+                <p class="font-semibold text-fuchsia-300 mb-1">AI Recommendation:</p>
+                <p id="audit-recommendation">Convert from static Likert rating to dynamic micro-budget token allocation or rapid-choice swipe cards with explicit cost tradeoffs.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generated Gamified Experiences -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="gamepad" class="w-4 h-4 text-emerald-400"></i>
+              <span>Generated Gamified Question Formats</span>
+            </h3>
+            <span class="text-xs text-emerald-400 font-mono">3 Formats Ready</span>
+          </div>
+
+          <div class="space-y-4" id="ai-generated-formats">
+            
+            <!-- Format 1: Forced-Choice Micro-Budget -->
+            <div class="glass-card rounded-2xl p-5 border-emerald-500/30 hover:border-emerald-500/50 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">FORMAT 1</span>
+                  <h4 class="text-sm font-bold text-white">The Micro-Budget Conjoint Auction</h4>
+                </div>
+                <span class="text-xs font-mono text-emerald-400">Best for Willingness-to-Pay</span>
+              </div>
+              <p class="text-xs text-slate-300 mb-2">
+                <strong>Mechanism:</strong> Users receive 100 finite credits to construct an order, forcing an explicit mathematical trade-off between speed, cash discount, and packaging.
+              </p>
+              <div class="p-2.5 rounded-lg bg-slate-900 text-[11px] font-mono text-indigo-300 border border-slate-800">
+                Captured Construct: Elasticity of Green Demand at Price Points (₹15, ₹25, ₹40)
+              </div>
+            </div>
+
+            <!-- Format 2: Time-Decay Rapid Swipe -->
+            <div class="glass-card rounded-2xl p-5 border-indigo-500/30 hover:border-indigo-500/50 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">FORMAT 2</span>
+                  <h4 class="text-sm font-bold text-white">Rapid-Fire Time-Decay Dilemma (Swipe)</h4>
+                </div>
+                <span class="text-xs font-mono text-indigo-400">Best for Implicit Reflexes</span>
+              </div>
+              <p class="text-xs text-slate-300 mb-2">
+                <strong>Mechanism:</strong> Users have 3.5 seconds to swipe Left or Right between two high-contrast realistic scenarios. Time decay bypasses pre-frontal social desirability filters.
+              </p>
+              <div class="p-2.5 rounded-lg bg-slate-900 text-[11px] font-mono text-fuchsia-300 border border-slate-800">
+                Captured Construct: Implicit Association & Cognitive Hesitation Angle
+              </div>
+            </div>
+
+            <!-- Format 3: Projective Roleplay -->
+            <div class="glass-card rounded-2xl p-5 border-amber-500/30 hover:border-amber-500/50 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">FORMAT 3</span>
+                  <h4 class="text-sm font-bold text-white">Projective Scenario Simulation ("The Friend Test")</h4>
+                </div>
+                <span class="text-xs font-mono text-amber-400">Best for Stigmatized Topics</span>
+              </div>
+              <p class="text-xs text-slate-300 mb-2">
+                <strong>Mechanism:</strong> Rather than asking "What would you do?", asks the consumer to predict what a colleague or average shopper would choose under budget constraints.
+              </p>
+              <div class="p-2.5 rounded-lg bg-slate-900 text-[11px] font-mono text-amber-300 border border-slate-800">
+                Captured Construct: Uncensored Normative Projection without Ego Defense
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: CHALLENGE 2: VERIFICATION & ONBOARDING SYSTEM                       -->
+    <!-- ========================================================================= -->
+    <div id="tab-challenge2" class="tab-content space-y-8 hidden">
+      
+      <div class="glass-panel rounded-2xl p-6 border-l-4 border-emerald-500 shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Challenge 2: Product & Engineering Proposal</span>
+              <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-semibold border border-cyan-500/30">Progressive Verification & Trust Architecture</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white mt-1">Trustworthy Consumer Onboarding & Fraud Prevention</h1>
+            <p class="text-sm text-slate-300 mt-1 max-w-3xl">
+              Balancing user conversion against data integrity: Progressive Tiered KYC, Zero-PII Tokenization, Sybil duplicate account detection, and Longitudinal Response Reliability scoring.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flowchart / User Journey Visualizer -->
+      <div class="glass-card rounded-2xl p-6 space-y-6">
+        <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+          <i data-lucide="git-commit" class="w-4 h-4 text-emerald-400"></i>
+          <span>Recommended Consumer Onboarding Journey: "Earn First, Verify Upon Cashout"</span>
+        </h3>
+
+        <!-- 4-Step Progressive Journey Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+          
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 relative">
+            <span class="absolute -top-3 left-4 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white">STEP 1</span>
+            <div class="mt-2 space-y-2">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="smartphone" class="w-4 h-4 text-indigo-400"></i>
+                <h4 class="text-xs font-bold text-white">Instant Signup (10s)</h4>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                Phone Number + 4-digit OTP. <strong>Zero sensitive identity data requested upfront.</strong> Device fingerprint captured silently.
+              </p>
+              <div class="text-[10px] font-mono text-emerald-400">Drop-off: &lt;8%</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 relative">
+            <span class="absolute -top-3 left-4 px-2 py-0.5 rounded text-[10px] font-bold bg-fuchsia-600 text-white">STEP 2</span>
+            <div class="mt-2 space-y-2">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="gamepad-2" class="w-4 h-4 text-fuchsia-400"></i>
+                <h4 class="text-xs font-bold text-white">First Game & Earn</h4>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                Consumer immediately plays their first 3 gamified studies and earns <strong>₹150 in redeemable reward credits</strong>. Value is realized first!
+              </p>
+              <div class="text-[10px] font-mono text-emerald-400">High Endorphin Hook</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 relative">
+            <span class="absolute -top-3 left-4 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white">STEP 3</span>
+            <div class="mt-2 space-y-2">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="unlock" class="w-4 h-4 text-amber-400"></i>
+                <h4 class="text-xs font-bold text-white">Progressive Verification</h4>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                Triggered <strong>only when user taps "Withdraw to UPI/Bank"</strong>. Friction is natural because money is waiting to be transferred.
+              </p>
+              <div class="text-[10px] font-mono text-amber-400">Consent-Driven KYC</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 relative">
+            <span class="absolute -top-3 left-4 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">STEP 4</span>
+            <div class="mt-2 space-y-2">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="check-check" class="w-4 h-4 text-emerald-400"></i>
+                <h4 class="text-xs font-bold text-white">Instant Payout & Trust</h4>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                ₹1 penny drop or DigiLocker XML confirms 18+ age & unique name. Account elevated to <strong>Verified Panelist Tier 1</strong>.
+              </p>
+              <div class="text-[10px] font-mono text-emerald-400">Longitudinal Trust Active</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Live Sybil & Duplicate Account Detection Simulator -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-5 space-y-6">
+          <div class="glass-card rounded-2xl p-6 space-y-4 border-cyan-500/30">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                <i data-lucide="scan-face" class="w-4 h-4 text-cyan-400"></i>
+                <span>Sybil & Duplicate Account Simulator</span>
+              </h3>
+              <span class="text-[10px] font-mono text-cyan-400">Live API</span>
+            </div>
+            
+            <p class="text-xs text-slate-300">
+              Test how Hot Takes' privacy-preserving tokenization catches multi-accounting without storing raw PII:
+            </p>
+
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Candidate Phone Number:</label>
+                <input type="text" id="sim-phone" value="9876543210" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500">
+                <span class="text-[10px] text-slate-500">Try 9876543210 (existing collision) vs 9998887777 (clean)</span>
+              </div>
+
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Target Payout UPI VPA:</label>
+                <input type="text" id="sim-upi" value="existinguser@okhdfcbank" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500">
+                <span class="text-[10px] text-slate-500">Try existinguser@okhdfcbank vs newpanelist@icici</span>
+              </div>
+
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Date of Birth (18+ Verification):</label>
+                <input type="date" id="sim-dob" value="2002-04-12" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500">
+              </div>
+
+              <button onclick="testDuplicateVerification()" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs tracking-wide transition flex items-center justify-center space-x-2 shadow-lg shadow-cyan-600/25">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                <span>Run Sybil & Identity Verification Check</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Results & Security Architecture -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="glass-card rounded-2xl p-6 space-y-4" id="sim-results-card">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i>
+              <span>Verification Status & Identity Hashing Engine</span>
+            </h3>
+
+            <div class="space-y-3">
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-slate-400">Duplicate Check Verdict:</span>
+                  <span class="text-xs font-bold font-mono text-rose-400" id="res-dup-status">COLLISION DETECTED</span>
+                </div>
+                <p class="text-[11px] text-rose-300 font-mono" id="res-dup-reason">Account with identical phone hash already exists.</p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <span class="text-xs text-slate-400">Age Verification (18+ Requirement):</span>
+                <span class="text-xs font-bold font-mono text-emerald-400" id="res-age-status">ELIGIBLE (Age: 24)</span>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 font-mono text-[10px]">
+                <div class="text-slate-400 font-sans text-xs font-semibold">Privacy-Preserving SHA-256 Tokenization:</div>
+                <div class="text-slate-500 truncate">Phone Salted Hash: <span class="text-indigo-300" id="res-phone-hash">d3b3eb841e434e3c1cd0ac55fffbda29d55...</span></div>
+                <div class="text-slate-500 truncate">UPI Payment Hash: <span class="text-cyan-300" id="res-upi-hash">7a9b0c2d3e4f5a6b7c8d9e0f1a2b3c4d...</span></div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-900/40 text-xs text-emerald-300">
+                <p class="font-bold mb-1">Architecture Note: DPDP Act 2023 Compliance</p>
+                <p class="text-[11px] text-slate-300">
+                  Raw government identifiers (Aadhaar numbers) are never stored in Hot Takes' database. Identity uniqueness is enforced via HMAC-SHA256 hardware tokens inside an isolated AWS KMS PII Vault.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Prototype Client Script -->
+  <script src="app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
