@@ -1,13 +1,14 @@
 /**
  * Hot Takes - Interactive Prototype Client Application
- * Handles Telemetry Tracking, Gamification Levers, Virtue Gap Calculations,
- * and Live Backend Synchronization.
+ * Hybrid Architecture: Connects to local Node server API when available,
+ * and includes a zero-dependency Client-Side Fallback Engine so the prototype
+ * runs 100% interactively even when opened directly as a static file (file:///)!
  */
 
 // Global State
 const state = {
   activeTab: 'tab-challenge1',
-  conventionalRating: 5, // Default stated rating
+  conventionalRating: 5, // Default stated rating (1-5)
   revealedPackaging: 'standard', // 'standard' | 'eco'
   revealedSpeed: 'express', // 'express' | 'green'
   revealedReward: 'cashback', // 'cashback' | 'offset'
@@ -29,6 +30,43 @@ window.addEventListener('mousemove', (e) => {
     state.mouseTrajectory.push({ x: e.clientX, y: e.clientY, t: Date.now() });
   }
 });
+
+// Toast Notification System (replaces blocking alert dialogs)
+function showToast(message, type = 'info') {
+  let toastContainer = document.getElementById('toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toast-container';
+    toastContainer.className = 'fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement('div');
+  const bgColors = {
+    info: 'bg-indigo-950/90 border-indigo-500/50 text-indigo-200',
+    success: 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200',
+    warning: 'bg-amber-950/90 border-amber-500/50 text-amber-200',
+    error: 'bg-rose-950/90 border-rose-500/50 text-rose-200'
+  };
+
+  toast.className = `p-3.5 rounded-xl border backdrop-blur-md shadow-2xl text-xs font-medium flex items-center space-x-2.5 transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto max-w-sm ${bgColors[type] || bgColors.info}`;
+  toast.innerHTML = `
+    <span class="w-2 h-2 rounded-full ${type === 'error' ? 'bg-rose-400' : type === 'success' ? 'bg-emerald-400' : 'bg-indigo-400'} animate-ping"></span>
+    <span class="flex-1">${message}</span>
+  `;
+
+  toastContainer.appendChild(toast);
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    toast.classList.remove('translate-y-4', 'opacity-0');
+  });
+
+  setTimeout(() => {
+    toast.classList.add('translate-y-4', 'opacity-0');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
 
 // Tab Switching
 function switchTab(tabId) {
@@ -213,10 +251,141 @@ function updateVirtueGapDisplay(revealedWtpPct = 0) {
 // Finalize Game Choice
 function finalizeGameChoice() {
   syncTelemetryToBackend();
-  switchTab('tab-telemetry');
+  showToast('Order committed! Switching to Live Telemetry Inspector...', 'success');
+  setTimeout(() => switchTab('tab-telemetry'), 600);
 }
 
-// Synchronize Telemetry with Server & Update Live Dashboard
+// =========================================================================
+// EMBEDDED CLIENT-SIDE INTELLIGENCE & VERIFICATION ENGINE (ZERO NETWORK)
+// =========================================================================
+
+function clientCalculateEntropy(choices) {
+  if (!choices || choices.length < 2) return 1.0;
+  const counts = {};
+  for (const c of choices) counts[c] = (counts[c] || 0) + 1;
+  const n = choices.length;
+  let entropy = 0;
+  const uniqueValues = Object.keys(counts).length;
+  if (uniqueValues <= 1) return 0.0;
+  for (const key of Object.keys(counts)) {
+    const p = counts[key] / n;
+    entropy -= p * Math.log2(p);
+  }
+  const maxEntropy = Math.log2(uniqueValues);
+  return maxEntropy > 0 ? entropy / maxEntropy : 0.0;
+}
+
+function clientComputeRQS(telemetry) {
+  const {
+    wordCount = 28,
+    timeToFirstInteractionMs = 1200,
+    totalDwellTimeMs = 4500,
+    answerFlips = 1,
+    cursorJitterVariance = 14.5,
+    choiceHistory = ['standard', 'eco', 'standard']
+  } = telemetry;
+
+  // Pace Evaluation
+  const estimatedReadTimeMs = Math.max(1500, (wordCount / (230 / 60)) * 1000);
+  let paceScore = 0.5;
+  let paceFlag = null;
+
+  if (totalDwellTimeMs < estimatedReadTimeMs * 0.35) {
+    paceScore = 0.1;
+    paceFlag = 'RUSHED_RESPONSE: Answer submitted faster than human comprehension limit.';
+  } else if (timeToFirstInteractionMs < 300) {
+    paceScore = 0.35;
+    paceFlag = 'REFLEXIVE_TAP: First touch occurred before prompt could be parsed.';
+  } else {
+    const paceRatio = totalDwellTimeMs / estimatedReadTimeMs;
+    paceScore = Math.min(1.0, 0.75 + Math.min(0.25, paceRatio * 0.1));
+  }
+
+  // Deliberation Evaluation
+  let delibScore = 0.8;
+  let cognitiveState = 'CONFIDENT';
+  if (answerFlips >= 1 && answerFlips <= 3) {
+    delibScore = 1.0;
+    cognitiveState = 'ACTIVE_EVALUATION';
+  } else if (answerFlips > 5) {
+    delibScore = 0.35;
+    cognitiveState = 'ERRATIC_CONFUSION';
+  }
+
+  if (cursorJitterVariance < 1.0) {
+    delibScore *= 0.5;
+    cognitiveState = 'SYNTHETIC_OR_BOT_TRAJECTORY';
+  }
+
+  const entropy = clientCalculateEntropy(choiceHistory);
+  const flags = [];
+  if (paceFlag) flags.push(paceFlag);
+  if (cognitiveState === 'ERRATIC_CONFUSION') flags.push('ERRATIC_ANSWER_FLIPS');
+  if (cognitiveState === 'SYNTHETIC_OR_BOT_TRAJECTORY') flags.push('LOW_TRAJECTORY_JITTER_BOT_RISK');
+  if (entropy < 0.45 && choiceHistory.length >= 3) flags.push('STRAIGHT_LINING_SUSPECTED');
+
+  const rawRQS = (
+    paceScore * 0.35 +
+    delibScore * 0.30 +
+    Math.min(1.0, entropy + 0.2) * 0.25 +
+    (cursorJitterVariance > 2.0 ? 1.0 : 0.2) * 0.10
+  ) * 100;
+
+  const penalty = flags.length * 15;
+  const finalScore = Math.max(0, Math.min(100, Math.round(rawRQS - penalty)));
+
+  let qualityTier = 'GOLD';
+  if (finalScore < 40) qualityTier = 'REJECTED';
+  else if (finalScore < 65) qualityTier = 'SUSPICIOUS';
+  else if (finalScore < 85) qualityTier = 'SILVER';
+
+  return {
+    responseQualityScore: finalScore,
+    qualityTier,
+    entropy: parseFloat(entropy.toFixed(2)),
+    cognitiveState,
+    anomalyFlags: flags,
+    isValidResponse: finalScore >= 60
+  };
+}
+
+function clientComputeES(gameTelemetry) {
+  const {
+    sliderAdjustments = 3,
+    cardsSwiped = 4,
+    microInteractionsCount = 8,
+    activeManipulatingTimeMs = 3400,
+    totalDwellTimeMs = 4800
+  } = gameTelemetry;
+
+  const totalSecs = Math.max(1, totalDwellTimeMs / 1000);
+  const actionsPerSec = (sliderAdjustments + cardsSwiped + microInteractionsCount) / totalSecs;
+  const actionScore = Math.min(1.0, actionsPerSec / 1.5);
+  const activeRatio = Math.min(1.0, activeManipulatingTimeMs / Math.max(1, totalDwellTimeMs));
+  const mechanicsScore = Math.min(1.0, (sliderAdjustments > 0 ? 0.5 : 0) + (cardsSwiped > 0 ? 0.5 : 0));
+
+  const compositeScore = Math.round((actionScore * 0.40 + activeRatio * 0.35 + mechanicsScore * 0.25) * 100);
+
+  return {
+    engagementScore: Math.max(10, Math.min(100, compositeScore)),
+    engagementGrade: compositeScore > 80 ? 'HIGH IMMERSION' : compositeScore > 50 ? 'MODERATE' : 'PASSIVE'
+  };
+}
+
+// Pseudo-HMAC Salted Hash for in-browser offline simulation
+function clientHashToken(str) {
+  if (!str) return 'null_token';
+  let clean = String(str).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (/^\d+$/.test(clean) && clean.length > 10) clean = clean.slice(-10);
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < clean.length; i++) {
+    hash ^= clean.charCodeAt(i);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+  return ('0000000' + (hash >>> 0).toString(16)).slice(-8) + 'c94e019b841a2f60e1d8a39';
+}
+
+// Synchronize Telemetry with Server (with Seamless Offline Client Engine)
 function syncTelemetryToBackend() {
   const dwellTime = Date.now() - state.startTime;
   const timeToFirst = state.firstTouchTime ? state.firstTouchTime - state.startTime : 1200;
@@ -264,12 +433,20 @@ function syncTelemetryToBackend() {
   .then(data => {
     if (data.success) {
       updateTelemetryUI(data.rqs, data.es, payload);
+    } else {
+      fallbackClientEngine(payload);
     }
   })
   .catch(() => {
-    // Fallback in-browser calculation if offline
-    fallbackClientTelemetryUpdate(payload);
+    // Seamless fallback to client-side mathematical engine
+    fallbackClientEngine(payload);
   });
+}
+
+function fallbackClientEngine(payload) {
+  const rqs = clientComputeRQS(payload.telemetry);
+  const es = clientComputeES(payload.gameTelemetry);
+  updateTelemetryUI(rqs, es, payload);
 }
 
 function updateTelemetryUI(rqs, es, payload) {
@@ -286,6 +463,46 @@ function updateTelemetryUI(rqs, es, payload) {
   document.getElementById('card-flips-badge').innerText = `${payload.telemetry.answerFlips} Reversals`;
   document.getElementById('card-cognitive-desc').innerText = rqs.cognitiveState;
 
+  if (document.getElementById('card-entropy-score')) {
+    const entropyVal = rqs.entropy !== undefined ? rqs.entropy : 0.89;
+    document.getElementById('card-entropy-score').innerText = entropyVal;
+    document.getElementById('card-entropy-status').innerText = entropyVal > 0.4 ? 'NON-PATTERNED' : 'PATTERNED / STRAIGHT-LINE';
+    document.getElementById('card-entropy-status').className = entropyVal > 0.4 ? 'text-xs font-bold text-emerald-400' : 'text-xs font-bold text-rose-400';
+  }
+
+  // Update Anomaly Badges Container
+  const badgesContainer = document.getElementById('anomaly-badges-container');
+  if (badgesContainer) {
+    if (rqs.anomalyFlags && rqs.anomalyFlags.length > 0) {
+      badgesContainer.innerHTML = rqs.anomalyFlags.map(flag => `
+        <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+            <span class="text-xs font-semibold text-rose-200">${flag}</span>
+          </div>
+          <span class="text-[11px] font-mono text-rose-400">FLAGGED</span>
+        </div>
+      `).join('');
+    } else {
+      badgesContainer.innerHTML = `
+        <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-semibold text-emerald-200">Natural Reading Cadence</span>
+          </div>
+          <span class="text-[11px] font-mono text-emerald-400">${payload.telemetry.totalDwellTimeMs}ms dwell</span>
+        </div>
+        <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-semibold text-emerald-200">Pointer Micro-Jitter Present</span>
+          </div>
+          <span class="text-[11px] font-mono text-emerald-400">σ² = ${payload.telemetry.cursorJitterVariance} (Human)</span>
+        </div>
+      `;
+    }
+  }
+
   // JSON viewer
   const viewer = document.getElementById('telemetry-json-viewer');
   if (viewer) {
@@ -295,23 +512,12 @@ function updateTelemetryUI(rqs, es, payload) {
       computedScores: {
         rqs: rqs.responseQualityScore,
         tier: rqs.qualityTier,
-        anomalyFlags: rqs.anomalyFlags,
-        engagementScore: es.engagementScore
+        anomalyFlags: rqs.anomalyFlags || [],
+        engagementScore: es.engagementScore,
+        cognitiveState: rqs.cognitiveState
       }
     }, null, 2);
   }
-}
-
-function fallbackClientTelemetryUpdate(payload) {
-  const dwell = payload.telemetry.totalDwellTimeMs;
-  const flips = payload.telemetry.answerFlips;
-  let score = 85;
-  if (dwell < 1500) score -= 40;
-  if (flips === 0) score -= 10;
-  score = Math.max(10, Math.min(100, score));
-
-  document.getElementById('card-rqs-score').innerText = score;
-  document.getElementById('card-rqs-bar').style.width = `${score}%`;
 }
 
 // Evaluator Simulation: Normal User
@@ -322,7 +528,7 @@ function simulateNormalUser() {
   state.activeActionsCount = 6;
   state.choiceHistory = ['standard', 'eco', 'standard'];
   syncTelemetryToBackend();
-  alert('Simulated genuine human respondent: healthy 4.8s dwell, 2 trade-off reversals, normal trajectory jitter.');
+  showToast('Simulated genuine human: healthy 4.8s dwell, 2 reversals, normal jitter.', 'success');
 }
 
 // Evaluator Simulation: Speeding Bot
@@ -340,7 +546,9 @@ function simulateSpeedingBot() {
     },
     gameTelemetry: {
       sliderAdjustments: 0,
-      activeManipulatingTimeMs: 100,
+      cardsSwiped: 0,
+      microInteractionsCount: 1,
+      activeManipulatingTimeMs: 80,
       totalDwellTimeMs: 380
     }
   };
@@ -353,7 +561,11 @@ function simulateSpeedingBot() {
   .then(res => res.json())
   .then(data => {
     updateTelemetryUI(data.rqs, data.es, botPayload);
-    alert('Simulated Speeding Bot! Notice RQS immediately dropped to <40 (REJECTED tier) with RUSHED_RESPONSE and STRAIGHT_LINING flags.');
+    showToast('Simulated Speeding Bot! RQS dropped to REJECTED tier.', 'error');
+  })
+  .catch(() => {
+    fallbackClientEngine(botPayload);
+    showToast('Simulated Speeding Bot! RQS dropped to <40 (REJECTED tier) with RUSHED & STRAIGHT-LINING flags.', 'error');
   });
 }
 
@@ -401,59 +613,100 @@ function loadPresetQuestion() {
 
 function runAIAudit() {
   loadPresetQuestion();
-  alert('AI Bias Analysis Completed! 3 gamified question formats generated below.');
+  showToast('AI Bias Analysis Completed! 3 gamified mechanics generated.', 'success');
 }
 
-// Challenge 2: Duplicate Account Simulator
+// Challenge 2: Duplicate Account Simulator (Hybrid Server + Offline Client)
 function testDuplicateVerification() {
   const phone = document.getElementById('sim-phone').value;
   const upi = document.getElementById('sim-upi').value;
   const dob = document.getElementById('sim-dob').value;
 
+  const requestBody = {
+    phoneNumber: phone,
+    upiVpa: upi,
+    dateOfBirth: dob,
+    profile: { verificationTier: 2, totalStudiesCompleted: 5, averageRQS: 84 }
+  };
+
   fetch('/api/verify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      phoneNumber: phone,
-      upiVpa: upi,
-      dateOfBirth: dob,
-      profile: { verificationTier: 2, totalStudiesCompleted: 5, averageRQS: 84 }
-    })
+    body: JSON.stringify(requestBody)
   })
   .then(res => res.json())
   .then(data => {
-    if (data.duplicateCheck) {
-      const resDup = document.getElementById('res-dup-status');
-      const resReason = document.getElementById('res-dup-reason');
-      if (data.duplicateCheck.isDuplicate) {
-        resDup.innerText = 'COLLISION DETECTED';
-        resDup.className = 'text-xs font-bold font-mono text-rose-400';
-        resReason.innerText = data.duplicateCheck.message;
-        resReason.className = 'text-[11px] text-rose-300 font-mono';
-      } else {
-        resDup.innerText = 'UNIQUE & VERIFIED';
-        resDup.className = 'text-xs font-bold font-mono text-emerald-400';
-        resReason.innerText = 'No phone or payment collision detected.';
-        resReason.className = 'text-[11px] text-emerald-300 font-mono';
-      }
-    }
+    applyVerificationResults(data);
+    showToast('Verification check processed via server API.', 'info');
+  })
+  .catch(() => {
+    // Client-side verification fallback
+    const cleanPhone = String(phone).replace(/[^0-9]/g, '');
+    const isDupPhone = cleanPhone.includes('9876543210');
+    const isDupUpi = upi.trim().toLowerCase() === 'existinguser@okhdfcbank';
+    const isDuplicate = isDupPhone || isDupUpi;
 
-    if (data.ageCheck) {
-      const resAge = document.getElementById('res-age-status');
-      if (data.ageCheck.isEligible) {
-        resAge.innerText = `ELIGIBLE (Age: ${data.ageCheck.ageYears})`;
-        resAge.className = 'text-xs font-bold font-mono text-emerald-400';
-      } else {
-        resAge.innerText = `DISQUALIFIED UNDERAGE (Age: ${data.ageCheck.ageYears})`;
-        resAge.className = 'text-xs font-bold font-mono text-rose-400';
-      }
-    }
+    // Age validation
+    const birthDate = new Date(dob);
+    const today = new Date('2026-11-09');
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const mDiff = today.getMonth() - birthDate.getMonth();
+    if (mDiff < 0 || (mDiff === 0 && today.getDate() < birthDate.getDate())) age--;
 
-    if (data.hashes) {
-      document.getElementById('res-phone-hash').innerText = data.hashes.phoneHash.substring(0, 36) + '...';
-      document.getElementById('res-upi-hash').innerText = data.hashes.upiHash.substring(0, 36) + '...';
-    }
+    const clientData = {
+      duplicateCheck: {
+        isDuplicate,
+        message: isDuplicate 
+          ? (isDupPhone ? 'Account with identical phone hash already exists.' : 'Target payout UPI VPA already bound to another profile.')
+          : 'Clean uniqueness check.'
+      },
+      ageCheck: {
+        isEligible: age >= 18,
+        ageYears: age
+      },
+      hashes: {
+        phoneHash: clientHashToken(phone),
+        upiHash: clientHashToken(upi)
+      }
+    };
+
+    applyVerificationResults(clientData);
+    showToast(isDuplicate ? 'Sybil Collision Detected!' : 'Identity Verified Clean & Unique!', isDuplicate ? 'warning' : 'success');
   });
+}
+
+function applyVerificationResults(data) {
+  if (data.duplicateCheck) {
+    const resDup = document.getElementById('res-dup-status');
+    const resReason = document.getElementById('res-dup-reason');
+    if (data.duplicateCheck.isDuplicate) {
+      resDup.innerText = 'COLLISION DETECTED';
+      resDup.className = 'text-xs font-bold font-mono text-rose-400';
+      resReason.innerText = data.duplicateCheck.message;
+      resReason.className = 'text-[11px] text-rose-300 font-mono';
+    } else {
+      resDup.innerText = 'UNIQUE & VERIFIED';
+      resDup.className = 'text-xs font-bold font-mono text-emerald-400';
+      resReason.innerText = 'No phone or payment collision detected.';
+      resReason.className = 'text-[11px] text-emerald-300 font-mono';
+    }
+  }
+
+  if (data.ageCheck) {
+    const resAge = document.getElementById('res-age-status');
+    if (data.ageCheck.isEligible) {
+      resAge.innerText = `ELIGIBLE (Age: ${data.ageCheck.ageYears})`;
+      resAge.className = 'text-xs font-bold font-mono text-emerald-400';
+    } else {
+      resAge.innerText = `DISQUALIFIED UNDERAGE (Age: ${data.ageCheck.ageYears})`;
+      resAge.className = 'text-xs font-bold font-mono text-rose-400';
+    }
+  }
+
+  if (data.hashes) {
+    document.getElementById('res-phone-hash').innerText = data.hashes.phoneHash.substring(0, 36) + '...';
+    document.getElementById('res-upi-hash').innerText = data.hashes.upiHash.substring(0, 36) + '...';
+  }
 }
 
 function resetExperiment() {
@@ -471,6 +724,7 @@ function resetExperiment() {
   selectSpeed('express');
   selectReward('cashback');
   recalculateBudget();
+  showToast('Experiment reset to initial state.', 'info');
 }
 
 // Initial setup
